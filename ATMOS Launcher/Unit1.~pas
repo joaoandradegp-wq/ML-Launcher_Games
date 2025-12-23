@@ -1,0 +1,320 @@
+unit Unit1;
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
+  Dialogs, jpeg, ExtCtrls, StdCtrls, ShellApi, pngimage, RXCtrls, ComCtrls,
+  Menus, abfComponents, DateUtils, Animate, GIFCtrl;
+
+type
+//------------------------------------
+Campos = Array[1..4] of String;
+//------------------------------------
+
+type
+  TForm1 = class(TForm)
+    btn_jogar: TRxSpeedButton;
+    StatusBar1: TStatusBar;
+    MainMenu1: TMainMenu;
+    Arquivo1: TMenuItem;
+    Sair1: TMenuItem;
+    Sobre1: TMenuItem;
+    abfWav1: TabfWav;
+    N1: TMenuItem;
+    CartoesdeReferncia1: TMenuItem;
+    Timer1: TTimer;
+    Panel1: TPanel;
+    Registro1: TMenuItem;
+    Manual1: TMenuItem;
+    RxGIFAnimator2: TRxGIFAnimator;
+    Image1: TImage;
+    Voz: TButton;
+    abfWav2: TabfWav;
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure FormDestroy(Sender: TObject);
+    procedure btn_jogarClick(Sender: TObject);
+    procedure Sair1Click(Sender: TObject);
+    procedure abfWav1PlayAfter(Sender: TObject);
+    procedure abfWav1PlayBefore(Sender: TObject);
+    procedure Sobre1Click(Sender: TObject);
+    procedure FormActivate(Sender: TObject);
+    procedure CartoesdeReferncia1Click(Sender: TObject);
+    procedure Timer1Timer(Sender: TObject);
+    procedure Registro1Click(Sender: TObject);
+    procedure Manual1Click(Sender: TObject);
+    procedure VozClick(Sender: TObject);
+    procedure RxGIFAnimator2Click(Sender: TObject);
+    procedure VozExit(Sender: TObject);
+    procedure FormClick(Sender: TObject);
+    procedure Image1Click(Sender: TObject);
+  private
+  ClickCount: Integer;
+    { Private declarations }
+  public
+  DIR_App,DOSBOX_Config:String;
+  Arquivo_DOSBOX_Fisico:TStringList;
+    { Public declarations }
+  end;
+
+var
+  Form1: TForm1;
+
+const
+
+Array_ATMOS: Array[1..1] of Campos =
+(  {JOGO}     {CD}            {CONFIG}           {EXE}
+  ('WIN\FEAR','ISO\ATMOSFEAR','fear_dosbox.conf','c:\runexit\runexit C:\FEAR\ATMOS.EXE')
+);
+
+MAX_WAV_SIZE = 110 * 1024; // 110 KB
+
+implementation
+
+uses Unit2, Unit3;
+
+{$R *.dfm}
+
+procedure SearchWavFiles(const Dir: string; List: TStrings);
+var
+  SearchRec: TSearchRec;
+  Path: string;
+begin
+  Path := IncludeTrailingPathDelimiter(Dir);
+
+  // Procurar arquivos .wav no diretório atual
+  if FindFirst(Path + '*.wav', faAnyFile, SearchRec) = 0 then
+  begin
+    repeat
+      if (SearchRec.Attr and faDirectory = 0) and (SearchRec.Size < MAX_WAV_SIZE) and (UpperCase(Copy(SearchRec.Name, 1, 3)) = 'AT_') then
+        List.Add(Path + SearchRec.Name);
+    until FindNext(SearchRec) <> 0;
+    SysUtils.FindClose(SearchRec);
+  end;
+
+  // Procurar subdiretórios e recursivamente repetir o processo
+  if FindFirst(Path + '*', faDirectory, SearchRec) = 0 then
+  begin
+    repeat
+      if (SearchRec.Name <> '.') and (SearchRec.Name <> '..') and
+         (SearchRec.Attr and faDirectory <> 0) then
+      begin
+        SearchWavFiles(Path + SearchRec.Name, List);
+      end;
+    until FindNext(SearchRec) <> 0;
+    SysUtils.FindClose(SearchRec);
+  end;
+end;
+
+function GetRandomWavFile(const RootDir: string): string;
+var
+  FileList: TStringList;
+  RandomIndex: Integer;
+begin
+  Result := '';
+  FileList := TStringList.Create;
+  try
+    SearchWavFiles(RootDir, FileList);
+    if FileList.Count > 0 then
+    begin
+      Randomize;
+      RandomIndex := Random(FileList.Count);
+      Result := FileList[RandomIndex];
+    end;
+  finally
+    FileList.Free;
+  end;
+end;
+
+
+procedure TForm1.FormActivate(Sender: TObject);
+begin
+DIR_App:=ExtractFilePath(Application.ExeName);
+Form1.Caption:=Application.Title;
+AbfWav1.FileName:=GetRandomWavFile(DIR_App+'ISO\ATMOSFEAR\');
+ClickCount:=0;
+DOSBOX_Config:='BIN\dosbox-0.74.conf';
+StatusBar1.Panels[1].Text:='© '+IntToStr(YearOf(Date))+', JMBA Softwares. Todos os direitos reservados.';
+end;
+
+procedure TForm1.btn_jogarClick(Sender: TObject);
+begin
+  Try
+  CopyFile(PChar(Form1.DIR_App+'BIN\dosbox-0.74.conf'),PChar(Array_ATMOS[1][3]),True);
+  Finally
+  AbfWav1.Play;
+  end;
+end;
+
+procedure TForm1.abfWav1PlayAfter(Sender: TObject);
+var
+i:Integer;
+begin
+//-------------------------------------
+Sleep(4000);
+//-------------------------------------
+
+Arquivo_DOSBOX_Fisico:=TStringList.Create;
+Arquivo_DOSBOX_Fisico.LoadFromFile(DIR_APP+Array_ATMOS[1][3]);
+
+   for i:=0 to Arquivo_DOSBOX_Fisico.Count-1 do
+   begin
+    if Pos('fullscreen=false',Arquivo_DOSBOX_Fisico[i]) = 1 then
+    Arquivo_DOSBOX_Fisico[i]:='fullscreen=true';
+
+    if Pos('fullresolution=' ,Arquivo_DOSBOX_Fisico[i]) = 1 then
+    Arquivo_DOSBOX_Fisico[i]:='fullresolution=original';
+
+    if Pos('memsize=',Arquivo_DOSBOX_Fisico[i]) = 1 then
+    Arquivo_DOSBOX_Fisico[i]:='memsize=32';
+
+    if Pos('aspect=',Arquivo_DOSBOX_Fisico[i]) = 1 then
+    Arquivo_DOSBOX_Fisico[i]:='aspect=false';
+
+    if Pos('scaler=',Arquivo_DOSBOX_Fisico[i]) = 1 then
+    Arquivo_DOSBOX_Fisico[i]:='scaler=normal2x';
+
+    if Pos('core=',Arquivo_DOSBOX_Fisico[i]) = 1 then
+    Arquivo_DOSBOX_Fisico[i]:='core=auto';
+
+    if Pos('cputype=',Arquivo_DOSBOX_Fisico[i]) = 1 then
+    Arquivo_DOSBOX_Fisico[i]:='cputype=auto';
+
+    if Pos('cycles=',Arquivo_DOSBOX_Fisico[i]) = 1 then
+    Arquivo_DOSBOX_Fisico[i]:='cycles=max';
+
+    if Pos('cycleup=',Arquivo_DOSBOX_Fisico[i]) = 1 then
+    Arquivo_DOSBOX_Fisico[i]:='cycleup=1000';
+
+    if Pos('cycledown=',Arquivo_DOSBOX_Fisico[i]) = 1 then
+    Arquivo_DOSBOX_Fisico[i]:='cycledown=1000';
+
+    if Pos('[autoexec]',Arquivo_DOSBOX_Fisico[i]) = 1 then
+    begin
+    Arquivo_DOSBOX_Fisico.Add('@ECHO OFF');
+    Arquivo_DOSBOX_Fisico.Add('mount c "'+DIR_App+Array_ATMOS[1][1]+'" -freesize 5000');
+    Arquivo_DOSBOX_Fisico.Add('mount d "'+DIR_App+Array_ATMOS[1][2]+'"');
+    Arquivo_DOSBOX_Fisico.Add('c:');
+    Arquivo_DOSBOX_Fisico.Add('c:\windows\smartdrv.exe');
+    Arquivo_DOSBOX_Fisico.Add('cls');
+    Arquivo_DOSBOX_Fisico.Add('SET PATH=%PATH%;C:\WINDOWS;');
+    Arquivo_DOSBOX_Fisico.Add('SET TEMP=C:\WINDOWS\TEMP');
+    Arquivo_DOSBOX_Fisico.Add('lh devlod C:\SB16\DRV\CSP.SYS /UNIT=0 /BLASTER=A:220');
+    Arquivo_DOSBOX_Fisico.Add('lh devlod C:\SB16\DRV\CTMMSYS.SYS');
+    Arquivo_DOSBOX_Fisico.Add('SET SOUND=C:\SB16');
+    Arquivo_DOSBOX_Fisico.Add('SET BLASTER=A220 I7 D1 H5 P330 T6');
+    Arquivo_DOSBOX_Fisico.Add('SET MIDI=SYNTH:1 MAP:E');
+    Arquivo_DOSBOX_Fisico.Add('C:\SB16\MIXERSET /P /Q');
+    Arquivo_DOSBOX_Fisico.Add('win '+Array_ATMOS[1][4]);
+    Arquivo_DOSBOX_Fisico.Add('Exit.');
+    end;
+
+   end;
+
+Arquivo_DOSBOX_Fisico.SaveToFile(DIR_APP+Array_ATMOS[1][3]);
+Arquivo_DOSBOX_Fisico.Free;
+
+ShellExecute(Handle,'open',pchar(DIR_App+'BIN\DOSBox.exe')
+                          ,pchar('-conf '+Array_ATMOS[1][3]+' -noconsole -c "exit"')
+                          ,pchar(DIR_App),SW_HIDE);
+
+//-------------------------------------
+Sleep(4000);
+//-------------------------------------
+btn_jogar.Caption:='INICIAR';
+Timer1.Enabled:=True;
+Form1.Cursor:=crDefault;
+end;
+
+procedure TForm1.abfWav1PlayBefore(Sender: TObject);
+begin
+//-------------------------------------
+btn_jogar.Caption:='Iniciando...';
+btn_jogar.Enabled:=False;
+Form1.Cursor:=crHourGlass;
+//-------------------------------------
+end;
+
+procedure TForm1.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+Application.Terminate;
+end;
+
+procedure TForm1.FormDestroy(Sender: TObject);
+begin
+DeleteFile(DIR_App+Array_ATMOS[1][3]);
+DeleteFile('stdout.txt');
+DeleteFile('stderr.txt');
+end;
+
+procedure TForm1.Sair1Click(Sender: TObject);
+begin
+Close;
+end;
+
+procedure TForm1.Sobre1Click(Sender: TObject);
+begin
+ShellExecute(Handle,'open','http://phobosfreeware.blogspot.com','','',1);
+end;
+
+procedure TForm1.CartoesdeReferncia1Click(Sender: TObject);
+begin
+Application.CreateForm(TCards, Cards);
+Cards.ShowModal;
+Cards.Free;
+end;
+
+procedure TForm1.Timer1Timer(Sender: TObject);
+begin
+  if Form1.Handle = GetForegroundWindow() then
+  Close;
+end;
+
+procedure TForm1.Registro1Click(Sender: TObject);
+begin
+AboutBox.Visible:=True;
+Form1.Enabled:=False;
+end;
+
+procedure TForm1.Manual1Click(Sender: TObject);
+var
+Caminho: String;
+begin
+Caminho:=ExtractFileDir(Application.ExeName)+'\CARDS\00.pdf';
+ShellExecute(Application.Handle,'open',PChar(''+Caminho),'','',SW_SHOWMAXIMIZED) ;
+end;
+
+procedure TForm1.VozClick(Sender: TObject);
+begin
+AbfWav2.FileName:=GetRandomWavFile(DIR_App+'ISO\ATMOSFEAR\');
+AbfWav2.Play;
+end;
+
+procedure TForm1.RxGIFAnimator2Click(Sender: TObject);
+begin
+Inc(ClickCount);
+  if ClickCount >= 10 then
+  Voz.Visible:=True;
+
+end;
+
+procedure TForm1.VozExit(Sender: TObject);
+begin
+ClickCount:=0;
+Voz.Visible:=False;
+end;
+
+procedure TForm1.FormClick(Sender: TObject);
+begin
+ClickCount:=0;
+Voz.Visible:=False;
+end;
+
+procedure TForm1.Image1Click(Sender: TObject);
+begin
+ClickCount:=0;
+Voz.Visible:=False;
+end;
+
+end.
+

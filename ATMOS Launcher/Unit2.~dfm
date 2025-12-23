@@ -1,0 +1,77 @@
+object Cards: TCards
+  Left = 353
+  Top = 100
+  AutoSize = True
+  BorderIcons = []
+  BorderStyle = bsNone
+  ClientHeight = 480
+  ClientWidth = 640
+  Color = clBtnFace
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -11
+  Font.Name = 'MS Sans Serif'
+  Font.Style = []
+  KeyPreview = True
+  OldCreateOrder = False
+  Position = poDesktopCenter
+  OnClose = FormClose
+  OnKeyPress = FormKeyPress
+  PixelsPerInch = 96
+  TextHeight = 13
+  object Personagem: TImage
+    Left = 0
+    Top = 0
+    Width = 640
+    Height = 480
+    AutoSize = True
+    Center = True
+  end
+  object A1: TImage
+    Left = 8
+    Top = 8
+    Width = 193
+    Height = 225
+    OnDblClick = A1DblClick
+  end
+  object A2: TImage
+    Left = 224
+    Top = 8
+    Width = 193
+    Height = 225
+    OnDblClick = A2DblClick
+  end
+  object A3: TImage
+    Left = 440
+    Top = 8
+    Width = 193
+    Height = 225
+    OnDblClick = A3DblClick
+  end
+  object A4: TImage
+    Left = 8
+    Top = 248
+    Width = 193
+    Height = 225
+    OnDblClick = A4DblClick
+  end
+  object A5: TImage
+    Left = 224
+    Top = 248
+    Width = 193
+    Height = 225
+    OnDblClick = A5DblClick
+  end
+  object A6: TImage
+    Left = 440
+    Top = 248
+    Width = 193
+    Height = 225
+    OnDblClick = A6DblClick
+  end
+  object Wav: TabfWav
+    Left = 16
+    Top = 16
+    FileData = {00000000}
+  end
+end
