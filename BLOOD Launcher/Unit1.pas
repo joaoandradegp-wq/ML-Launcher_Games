@@ -25,9 +25,7 @@ type
     Image2: TImage;
     Registro1: TMenuItem;
     abfFolderMonitor1: TabfFolderMonitor;
-    Image1: TImage;
     cryptic: TImage;
-    SELECT: TImage;
     blood: TImage;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormDestroy(Sender: TObject);
@@ -38,8 +36,8 @@ type
     procedure Sobre1Click(Sender: TObject);
     procedure FormActivate(Sender: TObject);
     procedure Registro1Click(Sender: TObject);
-    procedure crypticClick(Sender: TObject);
-    procedure bloodClick(Sender: TObject);
+    procedure bloodDblClick(Sender: TObject);
+    procedure crypticDblClick(Sender: TObject);
   private
     { Private declarations }
   public
@@ -77,23 +75,16 @@ Form1.id:=Game;
   DeleteFile(Form1.DIR_App+Array_BLOOD[i][2]);
 
   case Game of
-    1: begin
-       Form1.SELECT.Left:=Form1.blood.Left;
-       Form1.btn_jogar.Caption:='ONE UNIT: WHOLE BLOOD';
-       end;
-    2: begin
-       Form1.SELECT.Left:=Form1.cryptic.Left;
-       Form1.btn_jogar.Caption:='CRYPTIC PASSAGE';
-       end;
+    1: Form1.btn_jogar.Caption:='ONE UNIT: WHOLE BLOOD';
+    2: Form1.btn_jogar.Caption:='CRYPTIC PASSAGE';
   end;
 
   Try
   CopyFile(PChar(Form1.DIR_App+'BIN\dosbox-0.74-blood.conf'),PChar(Array_BLOOD[Game][2]),True);
   Finally
-  Form1.SELECT.Visible:=True;
   Form1.btn_jogar.Enabled:=True;
   end;
-    
+
 end;
 
 procedure TForm1.FormActivate(Sender: TObject);
@@ -103,10 +94,16 @@ DIR_App:=ExtractFilePath(Application.ExeName);
 AbfWav1.FileName:=DIR_App+'BIN\blood_voice.wav';
 DOSBOX_Config:='BIN\dosbox-0.74-blood.conf';
 StatusBar1.Panels[1].Text:='© '+IntToStr(YearOf(Date))+', JMBA Softwares. Todos os direitos reservados.';
+Selecao(1);
 end;
 
 procedure TForm1.btn_jogarClick(Sender: TObject);
 begin
+  if blood.Visible = True then
+  Selecao(1)
+  else
+  Selecao(2);
+
 AbfWav1.Play;
 end;
 
@@ -150,7 +147,6 @@ ShellExecute(Handle,'open',pchar(DIR_App+'BIN\DOSBox.exe')
 //----------------------------
 Sleep(6000);
 //----------------------------
-btn_jogar.Caption:='INICIAR';
 btn_jogar.Enabled:=True;
 Form1.Cursor:=crDefault;
 end;
@@ -194,13 +190,17 @@ AboutBox.Visible:=True;
 Form1.Enabled:=False;
 end;
 
-procedure TForm1.crypticClick(Sender: TObject);
+procedure TForm1.bloodDblClick(Sender: TObject);
 begin
+blood.Visible:=False;
+cryptic.Visible:=True;
 Selecao(2);
 end;
 
-procedure TForm1.bloodClick(Sender: TObject);
+procedure TForm1.crypticDblClick(Sender: TObject);
 begin
+blood.Visible:=True;
+cryptic.Visible:=False;
 Selecao(1);
 end;
 
