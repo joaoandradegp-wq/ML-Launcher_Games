@@ -38,11 +38,11 @@ object AboutBox: TAboutBox
     object ProductName: TLabel
       Left = 88
       Top = 24
-      Width = 193
+      Width = 131
       Height = 78
       Caption = 
-        'DIG Launcher'#13#10'Vers'#227'o 1.0'#13#10#13#10'Eduardo Baldasso'#13#10'Mercado Livre: EDU' +
-        'ARDODUDA B'#13#10'CPF: 00257686037'
+        'DIG Launcher'#13#10'Vers'#227'o 1.0'#13#10#13#10'Edson Dutra Tramontin'#13#10'Mercado Livre' +
+        ': J-CRT'#13#10'CPF: 912.138.279-49'
       Font.Charset = ANSI_CHARSET
       Font.Color = clWindowText
       Font.Height = -11
