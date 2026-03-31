@@ -9,7 +9,7 @@ uses
 
 begin
   Application.Initialize;
-  Application.Title := 'GORIA LAUNCHER 1.0';
+  Application.Title := 'SIERRA LAUNCHER 1.0';
   Application.CreateForm(TForm1, Form1);
   Application.CreateForm(TAboutBox, AboutBox);
   Application.Run;

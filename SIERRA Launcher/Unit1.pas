@@ -21,10 +21,7 @@ type
     Sair1: TMenuItem;
     Sobre1: TMenuItem;
     abfWav1: TabfWav;
-    N1: TMenuItem;
     Timer1: TTimer;
-    OpenGL: TMenuItem;
-    Pasta: TMenuItem;
     Registro1: TMenuItem;
     btn_jogar: TRxSpeedButton;
     logo: TImage;

@@ -38,11 +38,11 @@ object AboutBox: TAboutBox
     object ProductName: TLabel
       Left = 104
       Top = 24
-      Width = 191
-      Height = 91
+      Width = 187
+      Height = 78
       Caption = 
-        'GORIA Launcher'#13#10'Vers'#227'o 1.0'#13#10#13#10'Diego Xavier'#13#10'Mercado Livre: DEPXA' +
-        'VIER0'#13#10'Telefone: (51) 3341-4380'#13#10'E-mail: depxavier@yahoo.com.br'
+        'SIERRA Launcher'#13#10'Vers'#227'o 1.0'#13#10#13#10'Rafael Fernando Moreno '#13#10'Mercado ' +
+        'Livre: RAFAELFMORENO'#13#10'CPF: 307.334.118-86'
       Font.Charset = ANSI_CHARSET
       Font.Color = clWindowText
       Font.Height = -11

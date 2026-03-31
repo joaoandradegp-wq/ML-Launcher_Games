@@ -27300,18 +27300,6 @@ object Form1: TForm1
     Left = 8
     object Arquivo1: TMenuItem
       Caption = '&Arquivo'
-      object OpenGL: TMenuItem
-        AutoCheck = True
-        Caption = 'Ativar OpenGL'
-        ShortCut = 16463
-      end
-      object Pasta: TMenuItem
-        Caption = 'Grava'#231#245'es'
-        ShortCut = 16455
-      end
-      object N1: TMenuItem
-        Caption = '-'
-      end
       object Sair1: TMenuItem
         Caption = '&Sair'
         OnClick = Sair1Click
